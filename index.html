@@ -244,4 +244,84 @@ function setView(v){S.view=v;save();render()}
 function notesHtml(n){
   const g=view()=='grid',cl=x=>NC[x.k==null?0:x.k];
   const it=n.map(x=>`<div class="${g?'gc':'row nr'} tap" style="border-${g?'top':'left'}:6px solid ${cl(x)}" onclick="openNote('${x.id}')"><h3>${esc(x.t||'Untitled')}</h3><p>${esc(x.b)}</p><div class="meta">${new Date(x.u).toLocaleDateString()}</div></div>`).join('');
-  return g?`<div class="grid">
+  return g?`<div class="grid">${it}</div>`:it;
+}
+function openNote(id){
+  const x=S.notes.find(n=>n.id==id);if(!x)return;
+  $('#dbody').innerHTML=`<h2>${esc(x.t||'Untitled')}</h2><div class="rd" style="border-left:6px solid ${NC[x.k==null?0:x.k]}">${(x.h?'<div style="white-space:normal">'+clean(x.h)+'</div>':esc(x.b))||'<span class="meta">No text yet.</span>'}</div><div class="acts"><button class="del" onclick="rm('${x.id}')">Delete</button><span class="sp"></span><button class="cancel" onclick="dlg.close()">Close</button><button class="add" onclick="edit('${x.id}')">Edit</button></div>`;
+  dlg.showModal();
+}
+function pick(i){ek=i;document.querySelectorAll('.swb').forEach((b,j)=>b.classList.toggle('on',j==i))}
+function unlock(){try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state=='suspended')AC.resume()}catch(e){}}
+function tickSnd(){
+  if(S.snd===false||!AC)return;
+  try{const t=AC.currentTime,o=AC.createOscillator(),g=AC.createGain(),f=AC.createBiquadFilter();o.type='triangle';o.frequency.setValueAtTime(150+Math.random()*50,t);f.type='lowpass';f.frequency.value=900;g.gain.setValueAtTime(.06,t);g.gain.exponentialRampToValueAtTime(.0001,t+.06);o.connect(f);f.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+.07)}catch(e){}
+}
+function togSnd(){S.snd=S.snd===false;save();render()}
+const SIG='<div class="by"><span class="ab">An app by</span><span class="sig">Rajat Kanti Satpati</span></div>';
+S.courses=S.courses||[];let cur=null;
+function openCourse(id){cur=id;render();scrollTo(0,0)}
+function coursesView(){
+  const c=cur&&S.courses.find(x=>x.id==cur);if(cur&&!c)cur=null;
+  if(c){courseDetail(c);return}
+  $('#list').innerHTML=S.courses.map(c=>{const t=c.cl.length,d=c.cl.filter(k=>k.d).length,p=t?Math.round(d/t*100):0,nx=c.cl.find(k=>!k.d);
+    return `<div class="row tap" onclick="openCourse('${c.id}')"><h3>${esc(c.n)}</h3><div class="bar ${t&&d==t?'done':''}"><span style="width:${p}%"></span></div><div class="meta" style="margin:0">${t?`${d} of ${t} classes · ${p}%`:'No classes yet'}${nx?` · Next: ${esc(nx.t)}`:t?' · Completed':''}</div></div>`}).join('')||'<div class="empty">No courses yet. Tap + course, then add its classes inside.</div>';
+}
+function courseDetail(c){
+  const t=c.cl.length,d=c.cl.filter(k=>k.d).length,p=t?Math.round(d/t*100):0;
+  $('#list').innerHTML=`<button class="small" onclick="cur=null;render()">← All courses</button><h3 class="ch tap" onclick="edit('${c.id}')">${esc(c.n)}</h3><div class="bar ${t&&d==t?'done':''}"><span style="width:${p}%"></span></div><div class="meta" style="margin:0 0 8px">${d} of ${t} classes · ${p}%</div>${c.cl.map(k=>`<div class="cls"><button class="check sm ${k.d?'on':''}" onclick="tcl('${c.id}','${k.id}')" aria-label="Mark class done">${k.d?'✓':''}</button><div class="hb"><b class="${k.d?'dn':''}">${esc(k.t)}</b></div><button class="del" onclick="dcl('${c.id}','${k.id}')" aria-label="Delete class">✕</button></div>`).join('')}<div class="addc"><input id="ncl" placeholder="Add a class, e.g. Class 1: Basics" onkeydown="if(event.key=='Enter')acl('${c.id}')"><button class="add" onclick="acl('${c.id}')">Add</button></div>`;
+}
+const gc_=id=>S.courses.find(x=>x.id==id);
+function acl(id){const v=$('#ncl').value.trim();if(!v)return;gc_(id).cl.push({id:uid(),t:v,d:false});save();coursesView();$('#ncl').focus()}
+function tcl(id,k){const x=gc_(id).cl.find(i=>i.id==k);x.d=!x.d;save();coursesView()}
+function dcl(id,k){if(!confirm('Delete this class?'))return;const c=gc_(id);c.cl=c.cl.filter(i=>i.id!=k);save();coursesView()}
+function fmt(c){
+  if(c=='formatBlock:h3'){document.execCommand('formatBlock',false,(document.queryCommandValue('formatBlock')||'').toLowerCase()=='h3'?'div':'h3');return}
+  document.execCommand(c,false,null);
+}
+function clean(h){
+  const t=document.createElement('template');t.innerHTML=h;
+  const A='B,I,U,S,STRONG,EM,STRIKE,UL,OL,LI,H3,DIV,BR,P'.split(',');
+  (function w(n){[...n.childNodes].forEach(c=>{
+    if(c.nodeType==3)return;
+    if(c.nodeType!=1){c.remove();return}
+    w(c);
+    if(A.includes(c.tagName)){[...c.attributes].forEach(a=>c.removeAttribute(a.name))}
+    else c.replaceWith(...c.childNodes);
+  })})(t.content);
+  return t.innerHTML;
+}
+const bkName=()=>'daybook-backup-'+new Date().toISOString().slice(0,10)+'.json';
+const bkData=()=>JSON.stringify({app:'daybook',v:1,at:Date.now(),data:S});
+function bkOpen(){
+  const d=S.lb?Math.floor((Date.now()-S.lb)/864e5):null;
+  $('#dbody').innerHTML=`<h2>Backup</h2><div class="meta" style="margin:0 0 12px">${d==null?'No backup yet':d==0?'Last backup: today':`Last backup: ${d} day${d>1?'s':''} ago`}</div><button class="add" style="width:100%" onclick="bkSave()">Save backup file</button><button class="cancel" style="width:100%;margin-top:10px" onclick="bkShare()">Share backup…</button><label for="bkf">Restore from a backup file</label><input type="file" id="bkf" accept=".json,application/json" onchange="bkLoad(this)"><div class="meta" style="margin-top:8px">Restoring replaces what is in the app now.</div><div class="acts"><span class="sp"></span><button class="cancel" onclick="dlg.close()">Close</button></div>`;
+  if(!dlg.open)dlg.showModal();
+}
+function bkDone(){S.lb=Date.now();save();bkOpen()}
+function bkSave(){
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([bkData()],{type:'application/json'}));a.download=bkName();
+  document.body.appendChild(a);a.click();a.remove();bkDone();
+}
+function bkShare(){
+  const f=new File([bkData()],bkName(),{type:'application/json'});
+  if(navigator.canShare&&navigator.canShare({files:[f]}))navigator.share({files:[f],title:'Daybook backup'}).then(bkDone).catch(()=>{});
+  else bkSave();
+}
+function bkLoad(i){
+  const f=i.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{try{
+    const d=JSON.parse(r.result).data;
+    if(!d||!Array.isArray(d.notes)||!Array.isArray(d.habits)||!Array.isArray(d.books))throw 0;
+    if(!confirm('Replace everything in the app with this backup?'))return;
+    S=Object.assign({notes:[],habits:[],books:[],courses:[]},d);save();dlg.close();cur=null;render();
+  }catch(e){alert('That file is not a Daybook backup.')}};
+  r.readAsText(f);
+}
+const dlg=$('#dlg');
+render();
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>
