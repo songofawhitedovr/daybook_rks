@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Daybook</title>
 <link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=Mrs+Saint+Delafield&family=Young+Serif&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <meta name="theme-color" content="#1E5B57">
 <style>
 :root{--bg:#E9EEE8;--card:#F7F9F5;--ink:#1D2B2A;--muted:#5E6F6C;--accent:#1E5B57;--on:#F7F9F5;--gold:#B7821F;--line:#CBD6CF;--danger:#A33A2E;
@@ -14,7 +15,7 @@ box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:en
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 'DM Sans',system-ui,sans-serif;-webkit-tap-highlight-color:transparent}
-main{max-width:560px;margin:0 auto;padding:20px 18px 110px}
+main{max-width:720px;margin:0 auto;padding:12px 14px 84px}
 header{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:14px}
 h1{font:400 34px/1.1 'Young Serif',Georgia,serif;margin:0}
 .date{color:var(--muted);font-size:14px;margin-top:4px}
@@ -47,8 +48,36 @@ textarea{min-height:150px;resize:vertical}
 nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);display:flex;padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px))}
 nav button{flex:1;background:none;border:0;padding:10px 0;font-size:15px;color:var(--muted);border-radius:10px}
 nav button.on{color:var(--accent);font-weight:700}
-.by{text-align:center;color:var(--muted);font-size:13px;margin-top:36px}
-#cv{display:block;width:100%;height:62vh;touch-action:none;background:var(--card);border:1px solid var(--line);border-radius:14px}
+.seg{display:flex;gap:6px;margin:0 0 12px}
+.seg button{flex:1;border:1px solid var(--line);background:none;border-radius:999px;padding:8px 0;font-size:14px;color:var(--muted)}
+.seg button.on{background:var(--accent);color:var(--on);border-color:var(--accent);font-weight:700}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.gc{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;min-height:120px;overflow:hidden}
+.gc h3{font:400 17px/1.25 'Young Serif',Georgia,serif;margin:0 0 6px}
+.gc p{margin:0;color:var(--muted);white-space:pre-wrap;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.nr{padding-left:12px}
+.rd{white-space:pre-wrap;max-height:50vh;overflow:auto;padding-left:12px;margin-top:6px}
+.cls{display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.check.sm{width:38px;height:38px;font-size:18px}
+.dn{text-decoration:line-through;color:var(--muted);font-weight:400}
+.ch{font:400 24px/1.2 'Young Serif',Georgia,serif;margin:14px 0 0}
+.addc{display:flex;gap:8px;margin-top:14px}
+.cls .del{padding:6px 10px}
+.tb{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+.tbb{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:6px 11px;font-size:15px;min-width:38px}
+.ed{min-height:150px;max-height:40vh;overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:11px 12px}
+.ed:focus-visible{outline:2px solid var(--accent)}
+.rd h3,.ed h3{font:400 19px 'Young Serif',Georgia,serif;margin:8px 0 4px}
+.rd ul,.ed ul{margin:6px 0;padding-left:22px}
+.hr{display:flex;gap:8px;align-items:center}
+.ib{border:1px solid var(--line);background:none;border-radius:999px;width:42px;height:40px;font-size:20px;line-height:1}
+.sw{display:flex;gap:10px;flex-wrap:wrap}
+.swb{width:34px;height:34px;border-radius:50%;border:2px solid transparent;padding:0}
+.swb.on{border-color:var(--ink);box-shadow:inset 0 0 0 3px var(--bg)}
+.by{display:flex;gap:8px;align-items:baseline;justify-content:center;margin-top:10px}
+.ab{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+.sig{font-family:'Mrs Saint Delafield','Segoe Script','Brush Script MT',cursive;font-size:21px;line-height:1;color:var(--gold)}
+#cv{display:block;width:100%;height:calc(100dvh - 305px);min-height:300px;touch-action:none;background:var(--card);border:1px solid var(--line);border-radius:14px}
 .gbar{display:flex;align-items:center;gap:12px;margin-top:12px}
 dialog{border:0;border-radius:16px;background:var(--bg);color:var(--ink);width:min(92vw,520px);padding:20px}
 dialog::backdrop{background:rgba(0,0,0,.45)}
@@ -74,24 +103,26 @@ const key=d=>{const x=new Date(d);return x.getFullYear()+'-'+String(x.getMonth()
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 const streak=h=>{let d=new Date(),n=0;if(!h.done.includes(key(d)))d.setDate(d.getDate()-1);while(h.done.includes(key(d))){n++;d.setDate(d.getDate()-1)}return n};
 const K=()=>tab=='gears'?'notes':tab;
-const TABS={notes:['Notes','Notes'],habits:['Habits','Habits'],books:['Books','Books']};
-const ADD={notes:'New note',gears:'New note',habits:'New habit',books:'New book'};
+const TABS={notes:['Notes','Notes'],habits:['Habits','Habits'],books:['Books','Books'],courses:['Courses','Courses']};
+const ADD={notes:'New note',gears:'New note',habits:'New habit',books:'New book',courses:'New course'};
 
 function render(){
   $('#nav').innerHTML=Object.keys(TABS).map(t=>`<button class="${t==tab?'on':''}" onclick="go('${t}')">${TABS[t][0]}</button>`).join('');
   const today=new Date().toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'long'});
-  let h=`<header><div><h1>${TABS[tab][1]}</h1><div class="date">${today}</div></div><button class="add" onclick="edit()">+ ${ADD[tab].split(' ')[1]}</button></header>`;
-  if(tab=='notes'&&S.notes.length>50)h+=`<input class="search" placeholder="Search notes" value="${esc(q)}" oninput="q=this.value;list()" aria-label="Search notes">`;
-  $('#app').innerHTML=h+'<div id="list"></div><div class="by">An app by Rajat Kanti Satpati</div>';list();
+  let h=`<header><div><h1>${TABS[tab][1]}</h1><div class="date">${today}</div></div><div class="hr"><button class="ib" onclick="bkOpen()" aria-label="Backup and restore">⋯</button>${tab=='courses'&&cur?'':`<button class="add" onclick="edit()">+ ${ADD[tab].split(' ')[1]}</button>`}</div></header>`;
+  if(tab=='notes')h+=segHtml();
+  if(tab=='notes'&&view()!='gears')h+=`<input class="search" placeholder="Search notes" value="${esc(q)}" oninput="q=this.value;list()" aria-label="Search notes">`;
+  $('#app').innerHTML=h+'<div id="list"></div>'+SIG;list();
 }
 function list(){
   let h='';
-  if(tab=='notes'&&S.notes.length&&S.notes.length<=50){gearsView();return}
+  if(tab=='courses'){coursesView();return}
+  if(tab=='notes'&&view()=='gears'&&S.notes.length){gearsView();return}
   if(tab=='notes'){
     const n=S.notes.filter(x=>(x.t+' '+x.b).toLowerCase().includes(q.toLowerCase())).sort((a,b)=>b.u-a.u);
-    h=n.map(x=>`<div class="row tap" onclick="edit('${x.id}')"><h3>${esc(x.t||'Untitled')}</h3><p>${esc(x.b)}</p><div class="meta">${new Date(x.u).toLocaleDateString()}</div></div>`).join('');
+    h=notesHtml(n);
     if(!h)h=`<div class="empty">${q?'No notes match your search.':'No notes yet. Tap + Note to write your first one.'}</div>`;
-    if(S.notes.length>50)h='<div class="meta">You have more than 50 notes, so they show as a normal list.</div>'+h;
+    if(S.notes.length>50&&(S.view||'gears')=='gears')h='<div class="meta">You have more than 50 notes, so they show as a normal list.</div>'+h;
   }else if(tab=='habits'){
     const days=[...Array(7)].map((_,i)=>{const d=new Date();d.setDate(d.getDate()-6+i);return d});
     h=S.habits.map(x=>{const t=key(new Date()),on=x.done.includes(t);
@@ -104,23 +135,25 @@ function list(){
   }
   $('#list').innerHTML=h;
 }
-function go(t){tab=t;q='';render();scrollTo(0,0)}
+function go(t){tab=t;q='';cur=null;render();scrollTo(0,0)}
 function tog(id,d){const x=S.habits.find(h=>h.id==id),i=x.done.indexOf(d);i>=0?x.done.splice(i,1):x.done.push(d);save();list()}
 function pg(id,n){const x=S.books.find(b=>b.id==id);x.read=Math.max(0,x.read+n);if(x.pages>0)x.read=Math.min(x.read,x.pages);save();list()}
 
 function edit(id){
-  const tab=K(),c=tab=='notes'?S.notes:tab=='habits'?S.habits:S.books,x=id?c.find(i=>i.id==id):null;
-  let f='';
-  if(tab=='notes')f=`<label for="f1">Title</label><input id="f1" value="${esc(x&&x.t)}"><label for="f2">Note</label><textarea id="f2">${esc(x&&x.b)}</textarea>`;
+  const tab=K(),c=tab=='notes'?S.notes:tab=='habits'?S.habits:tab=='courses'?S.courses:S.books,x=id?c.find(i=>i.id==id):null;
+  let f='';ek=x&&x.k!=null?x.k:null;
+  if(tab=='notes')f=`<label for="f1">Title</label><input id="f1" value="${esc(x&&x.t)}"><label for="f2">Note</label><div class="tb">${[['bold','<b>B</b>'],['italic','<i>I</i>'],['underline','<u>U</u>'],['strikeThrough','<s>S</s>'],['insertUnorderedList','• List'],['formatBlock:h3','Heading'],['removeFormat','Clear']].map(a=>`<button class="tbb" onpointerdown="event.preventDefault()" onclick="fmt('${a[0]}')">${a[1]}</button>`).join('')}</div><div id="f2" class="ed" contenteditable="true">${x?(x.h||esc(x.b).replace(/\n/g,'<br>')):''}</div><label>Colour</label><div class="sw">${NC.map((c,i)=>`<button class="swb ${i==ek?'on':''}" style="background:${c}" onclick="pick(${i})" aria-label="Colour ${i+1}"></button>`).join('')}</div>`;
+  if(tab=='courses')f=`<label for="f1">Course name</label><input id="f1" placeholder="Python for beginners" value="${esc(x&&x.n)}">`;
   if(tab=='habits')f=`<label for="f1">Habit name</label><input id="f1" placeholder="Read 20 minutes" value="${esc(x&&x.n)}">`;
   if(tab=='books')f=`<label for="f1">Title</label><input id="f1" value="${esc(x&&x.t)}"><label for="f2">Author</label><input id="f2" value="${esc(x&&x.a)}"><label for="f3">Total pages</label><input id="f3" type="number" inputmode="numeric" min="0" value="${x?x.pages:''}"><label for="f4">Pages read</label><input id="f4" type="number" inputmode="numeric" min="0" value="${x?x.read:0}">`;
   $('#dbody').innerHTML=`<h2>${x?'Edit':ADD[tab]}</h2>${f}<div class="acts">${x?`<button class="del" onclick="rm('${x.id}')">Delete</button>`:''}<span class="sp"></span><button class="cancel" onclick="dlg.close()">Cancel</button><button class="add" onclick="ok('${x?x.id:''}')">Save</button></div>`;
-  dlg.showModal();setTimeout(()=>$('#f1').focus(),50);
+  if(!dlg.open)dlg.showModal();setTimeout(()=>{const e=$(id&&tab=='notes'?'#f2':'#f1');e&&e.focus()},50);
 }
 function ok(id){
-  const tab=K(),v=n=>($('#f'+n)||{}).value||'';
+  const tab=K(),v=n=>{const e=$('#f'+n);return e?(e.value!==undefined?e.value:e.innerText):''};
   if(!v(1).trim()&&!v(2).trim()){dlg.close();return}
-  if(tab=='notes'){let x=S.notes.find(i=>i.id==id);if(!x){x={id:uid()};S.notes.push(x)}x.t=v(1).trim();x.b=v(2);x.u=Date.now()}
+  if(tab=='courses'){let x=S.courses.find(i=>i.id==id);if(!x){x={id:uid(),cl:[]};S.courses.push(x)}x.n=v(1).trim();save();dlg.close();render();return}
+  if(tab=='notes'){let x=S.notes.find(i=>i.id==id);if(!x){x={id:uid()};S.notes.push(x)}x.t=v(1).trim();x.b=v(2);x.h=clean($('#f2').innerHTML);x.u=Date.now();x.k=ek}
   if(tab=='habits'){if(!v(1).trim())return;let x=S.habits.find(i=>i.id==id);if(!x){x={id:uid(),done:[]};S.habits.push(x)}x.n=v(1).trim()}
   if(tab=='books'){if(!v(1).trim())return;let x=S.books.find(i=>i.id==id);if(!x){x={id:uid()};S.books.push(x)}x.t=v(1).trim();x.a=v(2).trim();x.pages=Math.max(0,+v(3)||0);x.read=Math.max(0,+v(4)||0)}
   save();dlg.close();render()
@@ -128,12 +161,12 @@ function ok(id){
 function rm(id){
   const tab=K();
   if(!confirm('Delete this? This cannot be undone.'))return;
-  S[tab]=S[tab].filter(i=>i.id!=id);save();dlg.close();render()
+  S[tab]=S[tab].filter(i=>i.id!=id);if(tab=='courses')cur=null;save();dlg.close();render()
 }
-const MOD=3,A=MOD*.55,D=MOD*.7,GAP=6,GC=['#D99A1E','#B8453A','#2F7F73','#3A5F78'],GT=['#1D2B2A','#fff','#fff','#fff'];
+const MOD=3,A=MOD*.55,D=MOD*.7,GAP=6,GC=['#D99A1E','#B8453A','#2F7F73','#3A5F78','#7A5C8E','#4F7F3A'],GT=['#1D2B2A','#fff','#fff','#fff','#fff','#fff'];
 let G=[],gphi=0,gomega=0,gdrag=null,graf=0,glast=0,gv={s:1,ox:0,oy:0};
 function layout(){
-  G=S.notes.map((n,i)=>{const N=Math.max(10,Math.min(30,10+Math.floor(((n.t||'').length+(n.b||'').length)/25)));return{n,N,r:N*MOD/2,x:0,y:0,a0:0,s:1,c:i%4}});
+  G=S.notes.map((n,i)=>{const N=Math.max(10,Math.min(30,10+Math.floor(((n.t||'').length+(n.b||'').length)/25)));return{n,N,r:N*MOD/2,x:0,y:0,a0:0,s:1,c:(n.k==null?i%6:n.k)}});
   for(let i=1;i<G.length;i++){
     const g=G[i];let best=null,bd=1e9;
     for(let j=0;j<i;j++){const p=G[j];
@@ -148,11 +181,12 @@ function layout(){
 function fit(c){
   let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;
   G.forEach(g=>{const R=g.r+A;x0=Math.min(x0,g.x-R);x1=Math.max(x1,g.x+R);y0=Math.min(y0,g.y-R);y1=Math.max(y1,g.y+R)});
-  const pad=24*(window.devicePixelRatio||1),s=Math.min((c.width-2*pad)/(x1-x0),(c.height-2*pad)/(y1-y0),5);
+  const pad=14*(window.devicePixelRatio||1),s=Math.min((c.width-2*pad)/(x1-x0),(c.height-2*pad)/(y1-y0),10);
   gv={s,ox:c.width/2-s*(x0+x1)/2,oy:c.height/2-s*(y0+y1)/2};
 }
 function draw(){
   const c=$('#cv');if(!c||!G.length)return;
+  const st=Math.floor(gphi*G[0].N/(2*Math.PI));if(st!==gtk){gtk=st;if(performance.now()-gts>55){gts=performance.now();tickSnd()}}
   const x=c.getContext('2d');x.setTransform(1,0,0,1,0,0);x.clearRect(0,0,c.width,c.height);
   x.setTransform(gv.s,0,0,gv.s,gv.ox,gv.oy);x.lineJoin='round';
   G.forEach(g=>{
@@ -176,12 +210,12 @@ function tick(t){
   if(tab=='notes'&&$('#cv')&&(gomega||gdrag))graf=requestAnimationFrame(tick);
 }
 function kick(){if(!graf){glast=performance.now();graf=requestAnimationFrame(tick)}}
-function spin(){gomega+=7;kick()}
+function spin(){unlock();gomega+=7;kick()}
 const gp=e=>{const c=$('#cv'),r=c.getBoundingClientRect(),k=c.width/r.width;return[(e.clientX-r.left)*k,(e.clientY-r.top)*k]};
 const gc=g=>[gv.ox+g.x*gv.s,gv.oy+g.y*gv.s];
 function hit(p){const w=[(p[0]-gv.ox)/gv.s,(p[1]-gv.oy)/gv.s];let b=null;G.forEach(g=>{if(Math.hypot(w[0]-g.x,w[1]-g.y)<=g.r+A)b=g});return b}
 function bind(c){
-  c.onpointerdown=e=>{const p=gp(e),g=hit(p);if(!g)return;c.setPointerCapture(e.pointerId);gomega=0;const q=gc(g);gdrag={g,p0:p,t0:Date.now(),mv:0,ang:Math.atan2(p[1]-q[1],p[0]-q[0]),lt:performance.now()}};
+  c.onpointerdown=e=>{unlock();const p=gp(e),g=hit(p);if(!g)return;c.setPointerCapture(e.pointerId);gomega=0;const q=gc(g);gdrag={g,p0:p,t0:Date.now(),mv:0,ang:Math.atan2(p[1]-q[1],p[0]-q[0]),lt:performance.now()}};
   c.onpointermove=e=>{
     if(!gdrag)return;const p=gp(e),q=gc(gdrag.g),an=Math.atan2(p[1]-q[1],p[0]-q[0]);
     let d=an-gdrag.ang;if(d>Math.PI)d-=2*Math.PI;if(d<-Math.PI)d+=2*Math.PI;gdrag.ang=an;
@@ -191,21 +225,23 @@ function bind(c){
   };
   c.onpointerup=c.onpointercancel=()=>{
     if(!gdrag)return;const g=gdrag;gdrag=null;
-    if(g.mv<8*(window.devicePixelRatio||1)&&Date.now()-g.t0<600){gomega=0;edit(g.g.n.id);return}
+    if(g.mv<8*(window.devicePixelRatio||1)&&Date.now()-g.t0<600){gomega=0;openNote(g.g.n.id);return}
     if(performance.now()-g.lt>90)gomega=0;
     if(gomega)kick();
   };
 }
 function gearsView(){
-  $('#list').innerHTML='<canvas id="cv" aria-label="Your notes as gears. Tap a gear to open the note."></canvas><div class="gbar"><button class="small" onclick="spin()">Spin</button><span class="meta">Tap a gear to open it. Drag to turn it.</span></div>';
+  $('#list').innerHTML=`<canvas id="cv" aria-label="Your notes as gears. Tap a gear to open the note."></canvas><div class="gbar"><button class="small" onclick="spin()">Spin</button><button class="small" onclick="togSnd()">${S.snd===false?'Sound off':'Sound on'}</button><span class="meta">Tap a gear to open it</span></div>`;
   const c=$('#cv'),d=window.devicePixelRatio||1,r=c.getBoundingClientRect();
   c.width=Math.round(r.width*d);c.height=Math.round(r.height*d);
   layout();fit(c);draw();bind(c);
 }
-addEventListener('resize',()=>{if(tab=='notes'&&S.notes.length&&S.notes.length<=50)gearsView()});
-const dlg=$('#dlg');
-render();
-if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
-</script>
-</body>
-</html>
+addEventListener('resize',()=>{if(tab=='notes'&&view()=='gears'&&S.notes.length)gearsView()});
+const NC=GC;let AC=null,gtk=0,gts=0,ek=null;
+const view=()=>{const v=S.view||'gears';return v=='gears'&&S.notes.length>50?'list':v};
+const segHtml=()=>`<div class="seg">${[['gears','Gears'],['grid','Grid'],['list','List']].map(a=>`<button class="${view()==a[0]?'on':''}" onclick="setView('${a[0]}')">${a[1]}</button>`).join('')}</div>`;
+function setView(v){S.view=v;save();render()}
+function notesHtml(n){
+  const g=view()=='grid',cl=x=>NC[x.k==null?0:x.k];
+  const it=n.map(x=>`<div class="${g?'gc':'row nr'} tap" style="border-${g?'top':'left'}:6px solid ${cl(x)}" onclick="openNote('${x.id}')"><h3>${esc(x.t||'Untitled')}</h3><p>${esc(x.b)}</p><div class="meta">${new Date(x.u).toLocaleDateString()}</div></div>`).join('');
+  return g?`<div class="grid">
